@@ -16,7 +16,6 @@
         let gapiInited = false;
         let gisInited = false;
 
-        // Automatically called by the async script tags above
         window.onload = function() {
             gapiLoaded();
             gisLoaded();
@@ -40,56 +39,58 @@
     </script>
 
     <style>
-        /* Your existing styles */
         *{box-sizing:border-box;margin:0;padding:0}
         body{background:#0d0d14;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#e8e6f0}
         .db{background:#0d0d14;min-height:100vh;padding:0 0 2rem}
-        .hero{background:#0d0d14;border-bottom:1px solid #1e1e30;padding:1.5rem 1.5rem 1rem;text-align:center;position:relative;overflow:hidden}
+        .hero{background:#0d0d14;border-bottom:1px solid #1e1e30;padding:1.5rem 1.5rem 1rem;text-align:center;position:relative}
         .hero-line{width:60px;height:2px;background:#7F77DD;margin:0 auto 0.75rem}
         .hero-name{font-size:22px;font-weight:500;color:#ccc8f4;letter-spacing:3px;text-transform:uppercase}
         .hero-sub{font-size:11px;color:#6b6880;letter-spacing:2px;margin-top:4px;text-transform:uppercase}
-        .metrics-row{display:flex;gap:10px;padding:1rem 1.5rem;flex-wrap:wrap}
-        .metric{flex:1;min-width:90px;background:#131320;border:0.5px solid #2a2840;border-radius:10px;padding:12px;text-align:center}
-        .metric-val{font-size:22px;font-weight:500;line-height:1}
-        .metric-label{font-size:10px;color:#6b6880;margin-top:4px;letter-spacing:1px;text-transform:uppercase}
-        .phase-nav{display:flex;gap:6px;padding:0 1.5rem 1rem;flex-wrap:wrap}
+        .phase-nav{display:flex;gap:6px;padding:1rem 1.5rem;flex-wrap:wrap}
         .ph-btn{padding:6px 14px;border-radius:8px;border:0.5px solid #2a2840;background:#131320;font-size:12px;cursor:pointer;color:#9b97e8}
         .ph-btn.active{background:#1e1a3a;border-color:#7F77DD;color:#ccc8f4}
         .phase-block{margin:0 1.5rem;background:#131320;border:0.5px solid #2a2840;border-radius:12px;overflow:hidden}
-        .phase-top{padding:1rem 1.25rem;border-bottom:0.5px solid #1e1e30;display:flex;align-items:center;justify-content:space-between}
-        .tab-strip{display:flex;border-bottom:0.5px solid #1e1e30;padding:0 1.25rem}
-        .tab-btn{padding:10px 14px;font-size:12px;color:#6b6880;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent}
+        .phase-top{padding:1rem 1.25rem;border-bottom:0.5px solid #1e1e30;font-weight:600;color:#ccc8f4}
+        .tab-strip{display:flex;border-bottom:0.5px solid #1e1e30;padding:0 1.25rem;background:#1a1a2e}
+        .tab-btn{padding:12px 16px;font-size:12px;color:#6b6880;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;transition:0.2s}
         .tab-btn.active{color:#9b97e8;border-bottom-color:#7F77DD}
-        .areas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;padding:1.25rem}
+        .areas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;padding:1.25rem}
         .area-card{background:#0d0d14;border:0.5px solid #2a2840;border-radius:10px;padding:1rem}
-        .dark-ta{width:100%;min-height:80px;background:#131320;border:0.5px solid #2a2840;border-radius:8px;padding:8px;font-size:12px;color:#ccc8f4;resize:vertical}
-        .save-bar{display:flex;align-items:center;gap:10px;padding:1rem 1.25rem;border-top:0.5px solid #1e1e30}
-        .save-btn{padding:7px 18px;background:#1e1a3a;border:0.5px solid #7F77DD;border-radius:8px;color:#ccc8f4;font-size:12px;cursor:pointer}
-        .save-ok{font-size:11px;color:#5DCAA5;display:none}
-        .star{position:absolute;border-radius:50%;background:#7F77DD}
+        .area-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;color:#7F77DD}
+        .dark-ta{width:100%;min-height:100px;background:#131320;border:0.5px solid #2a2840;border-radius:8px;padding:10px;font-size:13px;color:#ccc8f4;resize:vertical;line-height:1.5}
+        .save-bar{display:flex;align-items:center;gap:12px;padding:1.25rem;border-top:0.5px solid #1e1e30;background:#131320}
+        .save-btn{padding:8px 20px;background:#1e1a3a;border:0.5px solid #7F77DD;border-radius:8px;color:#ccc8f4;font-size:12px;cursor:pointer;transition:0.2s}
+        .save-btn:hover{background:#2a2455}
     </style>
 </head>
 <body>
     <div class="db">
         <div class="hero">
-            <div id="stars-container"></div>
             <div class="hero-line"></div>
             <div class="hero-name">R. Chandra Prakash</div>
             <div class="hero-sub">Life Playbook &nbsp;·&nbsp; 2026 – 2082</div>
         </div>
-        <div class="metrics-row" id="metrics-row"></div>
-        <div class="section-label" style="padding:0 1.5rem; font-size:10px; color:#6b6880; text-transform:uppercase;">Life phases</div>
         <div class="phase-nav" id="phase-nav"></div>
         <div class="phase-block" id="phase-block"></div>
     </div>
 
     <script>
-        const PHASES=[{id:'p1',label:'Phase 1',years:[2026],range:'2026',age:'28',accent:'#7F77DD',dim:'#1e1a3a'},{id:'p2',label:'Phase 2',years:[2027],range:'2027',age:'29',accent:'#378ADD',dim:'#0e1c30'},{id:'p3',label:'Phase 3',years:[2028],range:'2028',age:'30',accent:'#1D9E75',dim:'#0b1e18'},{id:'p4',label:'Phase 4',years:[2029,2030,2031,2032,2033],range:'2029–2033',age:'31–35',accent:'#EF9F27',dim:'#1e1607'},{id:'p5',label:'Phase 5',years:Array.from({length:10},(_,i)=>2034+i),range:'2034–2043',age:'36–45',accent:'#D85A30',dim:'#1e0e07'},{id:'p6',label:'Phase 6',years:Array.from({length:15},(_,i)=>2044+i),range:'2044–2058',age:'46–60',accent:'#D4537E',dim:'#1e0a14'},{id:'p7',label:'Phase 7',years:Array.from({length:24},(_,i)=>2059+i),range:'2059–2082',age:'61–84',accent:'#888780',dim:'#151514'}];
-        const AREAS=[{id:'agenda',label:'Agenda',hint:'Goals & milestones',dot:'#7F77DD'},{id:'place',label:'Place of stay',hint:'Location & housing',dot:'#378ADD'},{id:'income',label:'Income',hint:'Earnings & revenue',dot:'#1D9E75'},{id:'budget',label:'Budget',hint:'Spending & savings',dot:'#EF9F27'},{id:'things',label:'Things to own',hint:'Assets & possessions',dot:'#D85A30'},{id:'routine',label:'Routine',hint:'Daily habits & schedule',dot:'#D4537E'},{id:'diet',label:'Diet',hint:'Nutrition & health',dot:'#5DCAA5'}];
+        const PHASES=[{id:'p1',label:'Phase 1',range:'2026'},{id:'p2',label:'Phase 2',range:'2027'},{id:'p3',label:'Phase 3',range:'2028'},{id:'p4',label:'Phase 4',range:'2029–2033'},{id:'p5',label:'Phase 5',range:'2034–2043'},{id:'p6',label:'Phase 6',range:'2044–2058'},{id:'p7',label:'Phase 7',range:'2059–2082'}];
         
-        let store={}, curPhase='p1', curYear=2026, curTab='annual';
+        const AREAS=[
+            {id:'agenda',label:'Agenda',tab:'annual'},
+            {id:'place',label:'Place of stay',tab:'annual'},
+            {id:'income',label:'Income',tab:'annual'},
+            {id:'budget',label:'Budget',tab:'annual'},
+            {id:'things',label:'Things to own',tab:'annual'},
+            {id:'diet',label:'Diet & Health',tab:'annual'},
+            {id:'monthly',label:'Monthly Goals',tab:'monthly'},
+            {id:'routine',label:'Daily Routine',tab:'daily'}
+        ];
+        
+        let curPhase='p1', curTab='annual';
 
-        function sk(ph,yr,area){return `lp_${ph}_${yr}_${area}`}
+        function sk(ph,area){return `lp_${ph}_${area}`}
         function sv(k,v){localStorage.setItem(k,v)}
         function lv(k){return localStorage.getItem(k)||''}
 
@@ -102,32 +103,32 @@
 
         function renderBlock(){
             const ph=PHASES.find(p=>p.id===curPhase);
-            let html=`<div class="phase-top"><div>${ph.label}: ${ph.range}</div></div>`;
-            html+=`<div class="tab-strip"><button class="tab-btn ${curTab==='annual'?'active':''}" onclick="selTab('annual')">Annual goals</button></div>`;
+            let html=`<div class="phase-top">${ph.label} (${ph.range})</div>`;
+            html+=`<div class="tab-strip">
+                <button class="tab-btn ${curTab==='annual'?'active':''}" onclick="selTab('annual')">Annual Goals</button>
+                <button class="tab-btn ${curTab==='monthly'?'active':''}" onclick="selTab('monthly')">Monthly Goals</button>
+                <button class="tab-btn ${curTab==='daily'?'active':''}" onclick="selTab('daily')">Daily Routine</button>
+            </div>`;
             
-            if(curTab==='annual'){
-                html+=`<div class="areas-grid">`;
-                AREAS.forEach(a=>{
-                    const v=lv(sk(curPhase,curYear,a.id));
-                    html+=`<div class="area-card"><div class="area-title">${a.label}</div><textarea class="dark-ta" id="ta_${a.id}">${v}</textarea></div>`;
-                });
-                html+=`</div><div class="save-bar">
-                    <button class="save-btn" onclick="prepareDriveSave()">Save to Cloud</button>
-                    <button class="save-btn" style="background:#4a5568" onclick="loadFromDrive()">Load from Cloud</button>
-                </div>`;
-            }
+            html+=`<div class="areas-grid">`;
+            AREAS.filter(a=>a.tab===curTab).forEach(a=>{
+                const v=lv(sk(curPhase,a.id));
+                html+=`<div class="area-card"><div class="area-title">${a.label}</div><textarea class="dark-ta" id="ta_${a.id}" oninput="saveLocal('${a.id}')">${v}</textarea></div>`;
+            });
+            html+=`</div><div class="save-bar">
+                <button class="save-btn" onclick="prepareDriveSave()">Save to Cloud</button>
+                <button class="save-btn" style="background:#4a5568; border-color:#ccc" onclick="loadFromDrive()">Load from Cloud</button>
+            </div>`;
+            
             document.getElementById('phase-block').innerHTML=html;
         }
 
-        function saveAll(){
-            AREAS.forEach(a=>{
-                const el=document.getElementById(`ta_${a.id}`);
-                if(el) sv(sk(curPhase,curYear,a.id), el.value);
-            });
+        function saveLocal(areaId){
+            const val = document.getElementById(`ta_${areaId}`).value;
+            sv(sk(curPhase,areaId), val);
         }
 
         function prepareDriveSave() {
-            saveAll();
             const allData = {};
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
@@ -139,7 +140,6 @@
         async function saveToDrive(data) {
             if(!gisInited) { alert("Google not ready"); return; }
             tokenClient.callback = async (resp) => {
-                const metadata = { name: 'playbook_data.json', mimeType: 'application/json' };
                 const file = new Blob([JSON.stringify(data)], { type: 'application/json' });
                 const response = await gapi.client.drive.files.list({ q: "name = 'playbook_data.json' and trashed = false" });
                 const existingFile = response.result.files[0];
@@ -149,8 +149,11 @@
                     : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
                 
                 const method = existingFile ? 'PATCH' : 'POST';
-                const body = existingFile ? file : new FormData();
+                let body = file;
+
                 if(!existingFile){
+                    const metadata = { name: 'playbook_data.json', mimeType: 'application/json' };
+                    body = new FormData();
                     body.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
                     body.append('file', file);
                 }
@@ -160,7 +163,7 @@
                     headers: { 'Authorization': `Bearer ${gapi.auth.getToken().access_token}` },
                     body: body
                 });
-                alert("Saved to Google Drive!");
+                alert("Success: Saved to Google Drive!");
             };
             tokenClient.requestAccessToken({ prompt: 'consent' });
         }
@@ -170,9 +173,11 @@
                 const response = await gapi.client.drive.files.list({ q: "name = 'playbook_data.json' and trashed = false", fields: 'files(id)' });
                 if (response.result.files[0]) {
                     const res = await gapi.client.drive.files.get({ fileId: response.result.files[0].id, alt: 'media' });
-                    for (const key in res.result) localStorage.setItem(key, res.result[key]);
+                    const data = res.result;
+                    for (const key in data) localStorage.setItem(key, data[key]);
+                    alert("Data Loaded! Refreshing...");
                     location.reload();
-                } else { alert("No backup found."); }
+                } else { alert("No backup found on Drive."); }
             };
             tokenClient.requestAccessToken({ prompt: '' });
         }

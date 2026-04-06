@@ -289,7 +289,6 @@ function saveAllDaily(){DAILY_SLOTS.forEach(s=>{const el=document.getElementById
 renderStars();renderMetrics();renderNav();renderBlock();
 function prepareDriveSave() {
     saveAll(); 
-    // This collects EVERY goal you've typed into one package for Google Drive
     const allData = {};
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -310,7 +309,7 @@ function prepareDriveSaveDaily() {
         }
     }
     saveToDrive(allData);
-}   
+}
 // --- GOOGLE DRIVE CONFIG ---
 let tokenClient;
 let gapiInited = false;

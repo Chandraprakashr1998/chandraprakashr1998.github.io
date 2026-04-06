@@ -287,17 +287,30 @@ function saveMonth(aId,mi){const el=document.getElementById(`mta_${aId}_${mi}`);
 function saveDaily(s){const el=document.getElementById(`daily_${s}`);if(el)sv(sk(curPhase,curYear,'daily',s),el.value)}
 function saveAllDaily(){DAILY_SLOTS.forEach(s=>{const el=document.getElementById(`daily_${s.k}`);if(el)sv(sk(curPhase,curYear,'daily',s.k),el.value)});const m=document.getElementById('save-msg');if(m){m.style.display='inline';setTimeout(()=>m.style.display='none',2000)}}
 renderStars();renderMetrics();renderNav();renderBlock();
-    function prepareDriveSave() {
-    saveAll(); // Runs your original save logic
-    const allData = JSON.parse(localStorage.getItem('playbook_data') || '{}');
+function prepareDriveSave() {
+    saveAll(); 
+    // This collects EVERY goal you've typed into one package for Google Drive
+    const allData = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('lp_')) {
+            allData[key] = localStorage.getItem(key);
+        }
+    }
     saveToDrive(allData);
 }
 
 function prepareDriveSaveDaily() {
-    saveAllDaily(); // Runs your original daily save logic
-    const allData = JSON.parse(localStorage.getItem('playbook_data') || '{}');
+    saveAllDaily();
+    const allData = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('lp_')) {
+            allData[key] = localStorage.getItem(key);
+        }
+    }
     saveToDrive(allData);
-}
+}   
 // --- GOOGLE DRIVE CONFIG ---
 let tokenClient;
 let gapiInited = false;

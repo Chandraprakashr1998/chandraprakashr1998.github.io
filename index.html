@@ -257,7 +257,11 @@ function renderBlock(){
         <textarea class="dark-ta" placeholder="Your ${a.label.toLowerCase()} goals for ${curYear}..." id="ta_${a.id}" onchange="autosave('${a.id}')">${v}</textarea>
       </div>`;
     });
-    html += `<div class="save-bar"><button class="save-btn" onclick="prepareDriveSave()">Save to Cloud</button><span class="save-ok" id="save-msg">Saved successfully</span></div>`;
+  html += `<div class="save-bar">
+    <button class="save-btn" onclick="prepareDriveSave()">Save to Cloud</button>
+    <button class="save-btn" style="background:#4a5568; margin-left:10px" onclick="loadFromDrive()">Load from Cloud</button>
+    <span class="save-ok" id="save-msg">Action Successful</span>
+</div>`;
   }
   if(curTab==='monthly'){
     html+=`<div class="months-wrap">`;
@@ -324,13 +328,12 @@ async function initializeGapiClient() {
         discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
     });
     gapiInited = true;
-    // Initial load happens after GIS is also ready
 }
 
 function gisLoaded() {
     tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
+        client_id: '87624151021-vbmk6ehvie52k9ome6vsvmkeceeq42b0.apps.googleusercontent.com',
+        scope: 'https://www.googleapis.com/auth/drive.file',
         callback: '', 
     });
     gisInited = true;
@@ -371,6 +374,30 @@ async function saveToDrive(data) {
     } else {
         tokenClient.requestAccessToken({ prompt: '' });
     }
+}
+
+// Function to manually pull data back from Google Drive
+async function loadFromDrive() {
+    tokenClient.callback = async (resp) => {
+        if (resp.error !== undefined) throw (resp);
+        const response = await gapi.client.drive.files.list({
+            q: "name = 'playbook_data.json' and trashed = false",
+            fields: 'files(id)',
+        });
+        const file = response.result.files[0];
+        if (file) {
+            const res = await gapi.client.drive.files.get({ fileId: file.id, alt: 'media' });
+            const data = res.result;
+            for (const key in data) {
+                localStorage.setItem(key, data[key]);
+            }
+            alert("Data loaded from Cloud! Refreshing...");
+            location.reload(); 
+        } else {
+            alert("No backup found on Google Drive.");
+        }
+    };
+    tokenClient.requestAccessToken({ prompt: '' });
 }
 </script>
 </body>

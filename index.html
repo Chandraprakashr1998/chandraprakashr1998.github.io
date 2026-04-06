@@ -4,409 +4,180 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>R. Chandra Prakash — Life Playbook</title>
-    
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
-
+    
     <script>
-      // Your specific Google Client ID from the console
-    const CLIENT_ID = '87624151021-vbmk6ehvie52k9ome6vsvmkeceeq42b0.apps.googleusercontent.com';
-      const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+        // CONFIGURATION
+        const CLIENT_ID = '87624151021-vbmk6ehvie52k9ome6vsvmkeceeq42b0.apps.googleusercontent.com';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+        
+        let tokenClient;
+        let gapiInited = false;
+        let gisInited = false;
+
+        // Automatically called by the async script tags above
+        window.onload = function() {
+            gapiLoaded();
+            gisLoaded();
+        };
+
+        function gapiLoaded() { gapi.load('client', initializeGapiClient); }
+        async function initializeGapiClient() {
+            await gapi.client.init({
+                discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
+            });
+            gapiInited = true;
+        }
+        function gisLoaded() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: '', 
+            });
+            gisInited = true;
+        }
     </script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#0d0d14;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#e8e6f0}
-.db{background:#0d0d14;min-height:100vh;padding:0 0 2rem}
-.hero{background:#0d0d14;border-bottom:1px solid #1e1e30;padding:1.5rem 1.5rem 1rem;text-align:center;position:relative;overflow:hidden}
-.hero-line{width:60px;height:2px;background:#7F77DD;margin:0 auto 0.75rem}
-.hero-name{font-size:22px;font-weight:500;color:#ccc8f4;letter-spacing:3px;text-transform:uppercase}
-.hero-sub{font-size:11px;color:#6b6880;letter-spacing:2px;margin-top:4px;text-transform:uppercase}
-.hero-divider{width:40px;height:1px;background:#2a2840;margin:0.75rem auto 0}
-.metrics-row{display:flex;gap:10px;padding:1rem 1.5rem;flex-wrap:wrap}
-.metric{flex:1;min-width:90px;background:#131320;border:0.5px solid #2a2840;border-radius:10px;padding:12px;text-align:center}
-.metric-val{font-size:22px;font-weight:500;line-height:1}
-.metric-label{font-size:10px;color:#6b6880;margin-top:4px;letter-spacing:1px;text-transform:uppercase}
-.metric-sub{font-size:10px;color:#4e4a60;margin-top:2px}
-.section-label{font-size:10px;color:#6b6880;letter-spacing:2px;text-transform:uppercase;padding:0 1.5rem;margin-bottom:8px}
-.phase-nav{display:flex;gap:6px;padding:0 1.5rem 1rem;flex-wrap:wrap}
-.ph-btn{padding:6px 14px;border-radius:8px;border:0.5px solid #2a2840;background:#131320;font-size:12px;cursor:pointer;color:#9b97e8;font-family:inherit;transition:all 0.15s;white-space:nowrap}
-.ph-btn:hover{background:#1e1e30;border-color:#534AB7}
-.ph-btn.active{background:#1e1a3a;border-color:#7F77DD;color:#ccc8f4;font-weight:500}
-.phase-block{margin:0 1.5rem;background:#131320;border:0.5px solid #2a2840;border-radius:12px;overflow:hidden}
-.phase-top{padding:1rem 1.25rem;border-bottom:0.5px solid #1e1e30;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.ph-title{font-size:15px;font-weight:500}
-.ph-range{font-size:12px;color:#7F77DD;margin-top:2px}
-.ph-badge{font-size:11px;background:#1e1a3a;border:0.5px solid #534AB7;padding:3px 10px;border-radius:20px}
-.progress-wrap{padding:0.75rem 1.25rem;border-bottom:0.5px solid #1e1e30}
-.progress-track{height:3px;background:#1e1e30;border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;border-radius:2px;transition:width 0.4s}
-.progress-info{display:flex;justify-content:space-between;font-size:10px;color:#6b6880;margin-top:5px}
-.year-row{display:flex;gap:5px;padding:0.75rem 1.25rem;border-bottom:0.5px solid #1e1e30;flex-wrap:wrap}
-.yr-btn{padding:4px 10px;border-radius:6px;border:0.5px solid #2a2840;background:#0d0d14;font-size:11px;cursor:pointer;color:#6b6880;font-family:inherit}
-.yr-btn:hover{border-color:#534AB7;color:#9b97e8}
-.yr-btn.active{background:#1e1a3a;border-color:#7F77DD;color:#ccc8f4}
-.tab-strip{display:flex;border-bottom:0.5px solid #1e1e30;padding:0 1.25rem}
-.tab-btn{padding:10px 14px;font-size:12px;color:#6b6880;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px;font-family:inherit;background:none;border-top:none;border-left:none;border-right:none;letter-spacing:0.5px}
-.tab-btn.active{color:#9b97e8;border-bottom-color:#7F77DD}
-.tab-btn:hover{color:#ccc8f4}
-.areas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;padding:1.25rem}
-.area-card{background:#0d0d14;border:0.5px solid #2a2840;border-radius:10px;padding:1rem;transition:border-color 0.15s}
-.area-card:hover{border-color:#534AB7}
-.area-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.area-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.area-title{font-size:13px;font-weight:500;color:#ccc8f4}
-.area-hint{font-size:10px;color:#4e4a60;margin-top:1px}
-.dark-ta{width:100%;min-height:80px;background:#131320;border:0.5px solid #2a2840;border-radius:8px;padding:8px 10px;font-size:12px;color:#ccc8f4;resize:vertical;font-family:inherit;line-height:1.5}
-.dark-ta:focus{outline:none;border-color:#7F77DD;background:#0d0d14}
-.dark-ta::placeholder{color:#3a3850}
-.months-wrap{padding:1.25rem}
-.month-group{margin-bottom:1.5rem}
-.month-area-label{font-size:11px;color:#7F77DD;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.months-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
-.month-card{background:#0d0d14;border:0.5px solid #1e1e30;border-radius:8px;padding:8px}
-.month-lbl{font-size:10px;color:#6b6880;margin-bottom:5px;letter-spacing:0.5px}
-.month-inp{width:100%;border:none;background:transparent;font-size:11px;color:#ccc8f4;font-family:inherit;resize:none;min-height:44px;line-height:1.4}
-.month-inp:focus{outline:none}
-.month-inp::placeholder{color:#2a2840}
-.daily-wrap{padding:1.25rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
-.daily-card{background:#0d0d14;border:0.5px solid #2a2840;border-radius:10px;padding:1rem}
-.daily-time{font-size:11px;color:#7F77DD;font-weight:500;margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase}
-.save-bar{display:flex;align-items:center;gap:10px;padding:1rem 1.25rem;border-top:0.5px solid #1e1e30}
-.save-btn{padding:7px 18px;background:#1e1a3a;border:0.5px solid #7F77DD;border-radius:8px;color:#ccc8f4;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;letter-spacing:0.5px}
-.save-btn:hover{background:#2a2555;border-color:#9b97e8}
-.save-ok{font-size:11px;color:#5DCAA5;display:none;letter-spacing:0.5px}
-.star{position:absolute;border-radius:50%;background:#7F77DD}
-</style>
+
+    <style>
+        /* Your existing styles */
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{background:#0d0d14;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#e8e6f0}
+        .db{background:#0d0d14;min-height:100vh;padding:0 0 2rem}
+        .hero{background:#0d0d14;border-bottom:1px solid #1e1e30;padding:1.5rem 1.5rem 1rem;text-align:center;position:relative;overflow:hidden}
+        .hero-line{width:60px;height:2px;background:#7F77DD;margin:0 auto 0.75rem}
+        .hero-name{font-size:22px;font-weight:500;color:#ccc8f4;letter-spacing:3px;text-transform:uppercase}
+        .hero-sub{font-size:11px;color:#6b6880;letter-spacing:2px;margin-top:4px;text-transform:uppercase}
+        .metrics-row{display:flex;gap:10px;padding:1rem 1.5rem;flex-wrap:wrap}
+        .metric{flex:1;min-width:90px;background:#131320;border:0.5px solid #2a2840;border-radius:10px;padding:12px;text-align:center}
+        .metric-val{font-size:22px;font-weight:500;line-height:1}
+        .metric-label{font-size:10px;color:#6b6880;margin-top:4px;letter-spacing:1px;text-transform:uppercase}
+        .phase-nav{display:flex;gap:6px;padding:0 1.5rem 1rem;flex-wrap:wrap}
+        .ph-btn{padding:6px 14px;border-radius:8px;border:0.5px solid #2a2840;background:#131320;font-size:12px;cursor:pointer;color:#9b97e8}
+        .ph-btn.active{background:#1e1a3a;border-color:#7F77DD;color:#ccc8f4}
+        .phase-block{margin:0 1.5rem;background:#131320;border:0.5px solid #2a2840;border-radius:12px;overflow:hidden}
+        .phase-top{padding:1rem 1.25rem;border-bottom:0.5px solid #1e1e30;display:flex;align-items:center;justify-content:space-between}
+        .tab-strip{display:flex;border-bottom:0.5px solid #1e1e30;padding:0 1.25rem}
+        .tab-btn{padding:10px 14px;font-size:12px;color:#6b6880;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent}
+        .tab-btn.active{color:#9b97e8;border-bottom-color:#7F77DD}
+        .areas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;padding:1.25rem}
+        .area-card{background:#0d0d14;border:0.5px solid #2a2840;border-radius:10px;padding:1rem}
+        .dark-ta{width:100%;min-height:80px;background:#131320;border:0.5px solid #2a2840;border-radius:8px;padding:8px;font-size:12px;color:#ccc8f4;resize:vertical}
+        .save-bar{display:flex;align-items:center;gap:10px;padding:1rem 1.25rem;border-top:0.5px solid #1e1e30}
+        .save-btn{padding:7px 18px;background:#1e1a3a;border:0.5px solid #7F77DD;border-radius:8px;color:#ccc8f4;font-size:12px;cursor:pointer}
+        .save-ok{font-size:11px;color:#5DCAA5;display:none}
+        .star{position:absolute;border-radius:50%;background:#7F77DD}
+    </style>
 </head>
 <body>
-<div class="db">
-  <div class="hero">
-    <div id="stars-container" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none;"><div class="star" style="width: 1.28325px; height: 1.28325px; top: 40.9943%; left: 41.0915%; opacity: 0.248352;"></div><div class="star" style="width: 1.57433px; height: 1.57433px; top: 36.0185%; left: 38.5227%; opacity: 0.361866;"></div><div class="star" style="width: 1.45395px; height: 1.45395px; top: 78.5545%; left: 70.8569%; opacity: 0.307434;"></div><div class="star" style="width: 2.39741px; height: 2.39741px; top: 23.3175%; left: 71.334%; opacity: 0.258489;"></div><div class="star" style="width: 1.66478px; height: 1.66478px; top: 26.7613%; left: 70.4276%; opacity: 0.469381;"></div><div class="star" style="width: 2.68385px; height: 2.68385px; top: 60.7245%; left: 57.617%; opacity: 0.313021;"></div><div class="star" style="width: 1.11719px; height: 1.11719px; top: 95.3853%; left: 10.1787%; opacity: 0.303858;"></div><div class="star" style="width: 2.44185px; height: 2.44185px; top: 23.4551%; left: 8.57881%; opacity: 0.105892;"></div><div class="star" style="width: 1.31141px; height: 1.31141px; top: 67.2409%; left: 70.4253%; opacity: 0.443484;"></div><div class="star" style="width: 2.84277px; height: 2.84277px; top: 74.1907%; left: 42.4698%; opacity: 0.494153;"></div><div class="star" style="width: 1.79385px; height: 1.79385px; top: 15.0374%; left: 48.3612%; opacity: 0.192122;"></div><div class="star" style="width: 1.54256px; height: 1.54256px; top: 78.5034%; left: 34.6561%; opacity: 0.395798;"></div><div class="star" style="width: 2.25649px; height: 2.25649px; top: 29.8203%; left: 43.6386%; opacity: 0.342956;"></div><div class="star" style="width: 2.70328px; height: 2.70328px; top: 21.6235%; left: 53.9216%; opacity: 0.218416;"></div><div class="star" style="width: 1.39215px; height: 1.39215px; top: 91.1172%; left: 30.9362%; opacity: 0.124418;"></div><div class="star" style="width: 1.64572px; height: 1.64572px; top: 70.0634%; left: 50.1417%; opacity: 0.432755;"></div><div class="star" style="width: 2.4983px; height: 2.4983px; top: 57.7092%; left: 57.7516%; opacity: 0.34059;"></div><div class="star" style="width: 2.40009px; height: 2.40009px; top: 3.27676%; left: 15.3863%; opacity: 0.158222;"></div><div class="star" style="width: 2.15226px; height: 2.15226px; top: 1.46571%; left: 12.7032%; opacity: 0.345174;"></div><div class="star" style="width: 2.21669px; height: 2.21669px; top: 96.7311%; left: 4.0247%; opacity: 0.271049;"></div></div>
-    <div class="hero-line"></div>
-    <div class="hero-name">R. Chandra Prakash</div>
-    <div class="hero-sub">Life Playbook &nbsp;·&nbsp; 2026 – 2082 &nbsp;·&nbsp; Age 28 → 84</div>
-    <div class="hero-divider"></div>
-  </div>
-  <div class="metrics-row" id="metrics-row">
-<div class="metric"><div class="metric-val" style="color:#9b97e8">7</div><div class="metric-label">phases</div><div class="metric-sub">life chapters</div></div>
-<div class="metric"><div class="metric-val" style="color:#378ADD">7</div><div class="metric-label">areas</div><div class="metric-sub">life dimensions</div></div>
-<div class="metric"><div class="metric-val" style="color:#1D9E75">5</div><div class="metric-label">goals set</div><div class="metric-sub">of 399 slots</div></div>
-<div class="metric"><div class="metric-val" style="color:#EF9F27">1%</div><div class="metric-label">complete</div><div class="metric-sub">playbook filled</div></div>
-<div class="metric"><div class="metric-val" style="color:#D4537E">28</div><div class="metric-label">current age</div><div class="metric-sub">years young</div></div></div>
-  <div class="section-label" style="margin-top:0.5rem">Life phases</div>
-  <div class="phase-nav" id="phase-nav"><button class="ph-btn active" style="border-color:#7F77DD;color:#7F77DD" onclick="selPhase(&#39;p1&#39;)">Phase 1: 2026 <span style="font-size:10px;opacity:0.6">71%</span></button><button class="ph-btn" style="" onclick="selPhase(&#39;p2&#39;)">Phase 2: 2027 <span style="font-size:10px;opacity:0.6">0%</span></button><button class="ph-btn" style="" onclick="selPhase(&#39;p3&#39;)">Phase 3: 2028 <span style="font-size:10px;opacity:0.6">0%</span></button><button class="ph-btn" style="" onclick="selPhase(&#39;p4&#39;)">Phase 4: 2029–2033 <span style="font-size:10px;opacity:0.6">0%</span></button><button class="ph-btn" style="" onclick="selPhase(&#39;p5&#39;)">Phase 5: 2034–2043 <span style="font-size:10px;opacity:0.6">0%</span></button><button class="ph-btn" style="" onclick="selPhase(&#39;p6&#39;)">Phase 6: 2044–2058 <span style="font-size:10px;opacity:0.6">0%</span></button><button class="ph-btn" style="" onclick="selPhase(&#39;p7&#39;)">Phase 7: 2059–2082 <span style="font-size:10px;opacity:0.6">0%</span></button></div>
-  <div class="phase-block" id="phase-block">
-  <div class="phase-top">
-    <div><div class="ph-title" style="color:#7F77DD">Phase 1: 2026</div><div class="ph-range">Ages 28</div></div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <span style="font-size:11px;color:#6b6880">5/7 goals</span>
-      <span class="ph-badge" style="border-color:#7F77DD;color:#7F77DD;background:#1e1a3a">71% done</span>
+    <div class="db">
+        <div class="hero">
+            <div id="stars-container"></div>
+            <div class="hero-line"></div>
+            <div class="hero-name">R. Chandra Prakash</div>
+            <div class="hero-sub">Life Playbook &nbsp;·&nbsp; 2026 – 2082</div>
+        </div>
+        <div class="metrics-row" id="metrics-row"></div>
+        <div class="section-label" style="padding:0 1.5rem; font-size:10px; color:#6b6880; text-transform:uppercase;">Life phases</div>
+        <div class="phase-nav" id="phase-nav"></div>
+        <div class="phase-block" id="phase-block"></div>
     </div>
-  </div>
-  <div class="progress-wrap">
-    <div class="progress-track"><div class="progress-fill" style="width:71%;background:#7F77DD"></div></div>
-    <div class="progress-info"><span>Phase progress</span><span>71%</span></div>
-  </div><div class="tab-strip">
-    <button class="tab-btn active" onclick="selTab(&#39;annual&#39;)">Annual goals</button>
-    <button class="tab-btn" onclick="selTab(&#39;monthly&#39;)">Monthly</button>
-    <button class="tab-btn" onclick="selTab(&#39;daily&#39;)">Daily routine</button>
-  </div><div class="areas-grid"><div class="area-card">
-        <div class="area-hdr"><div class="area-dot" style="background:#7F77DD"></div><div><div class="area-title">Agenda</div><div class="area-hint">Goals &amp; milestones</div></div></div>
-        <textarea class="dark-ta" placeholder="Your agenda goals for 2026..." id="ta_agenda" onchange="autosave(&#39;agenda&#39;)">1.Learn car 
-2.Learn Swimming
-3.15% Fat body 
-4.Stock market (in sync with suri)
-5.Accounts and Taxation inter level
-6.Complete Scaler
-7.Finish10 Marathons</textarea>
-      </div><div class="area-card">
-        <div class="area-hdr"><div class="area-dot" style="background:#378ADD"></div><div><div class="area-title">Place of stay</div><div class="area-hint">Location &amp; housing</div></div></div>
-        <textarea class="dark-ta" placeholder="Your place of stay goals for 2026..." id="ta_place" onchange="autosave(&#39;place&#39;)">RR NAGAR HOME- FF</textarea>
-      </div><div class="area-card">
-        <div class="area-hdr"><div class="area-dot" style="background:#1D9E75"></div><div><div class="area-title">Income</div><div class="area-hint">Earnings &amp; revenue</div></div></div>
-        <textarea class="dark-ta" placeholder="Your income goals for 2026..." id="ta_income" onchange="autosave(&#39;income&#39;)">PRAAQAR SALARY </textarea>
-      </div><div class="area-card">
-        <div class="area-hdr"><div class="area-dot" style="background:#EF9F27"></div><div><div class="area-title">Budget</div><div class="area-hint">Spending &amp; savings</div></div></div>
-        <textarea class="dark-ta" placeholder="Your budget goals for 2026..." id="ta_budget" onchange="autosave(&#39;budget&#39;)"></textarea>
-      </div><div class="area-card">
-        <div class="area-hdr"><div class="area-dot" style="background:#D85A30"></div><div><div class="area-title">Things to own</div><div class="area-hint">Assets &amp; possessions</div></div></div>
-        <textarea class="dark-ta" placeholder="Your things to own goals for 2026..." id="ta_things" onchange="autosave(&#39;things&#39;)">FZ BIKE 
-SANTRO CAR 
-EXISTING WARDROBE 
-MARATHON ESSENTIALS: 
-  - Professional running shoes (TB)
-  - Decent running shoes for practice (TB)
-  - Smart watch 
-  - 2 Tracks decathalon (TB) , 2 Shorts with         
-     mobile holder (TB), 2 running shorts( TB)
-  - 5 Track shirts ( 2 TB) 
-  - Running man purse (TB)
-BADMINTON ESSENTIALS : 
-  - Racket 
-  - Duffle bag 
-  - NM Shoes (TB) 
-  - Knee support 
-  - Ankle support (TB) 
-  - Ankle socks (TB) 
-  - Left arm support (TB)
-  - Badminton shorts 5 (3TB) 
-  - Sweat shirts 5 
-  - Sweat towels (TB) 
-GYM AND BOXING ESSENTIALS: 
-   - Duffle bag 
-   - Sweat towels 
-   - Gym gloves (TB) 
-   - Sipper 
-   - Gym shoes 
-   - Gym shirts 5 (TB) 
-   - Gym Tracks 5 (2TB) 
-   - Boxing glove 
-   - Tego hoddie (TB)
-SWIMMING ESSENTIALS : 
-  - Head cap 
-  - Eye glasses 
-  - Ear plugs (TB)
-  - Swim suit 2 (TB)
-  - Waterproof Sunscreen(TB)
-CRICKET ESSENTIALS:
-  - Shoes 
-  - Sunscreen Jacket (TB)
-SHAMBAVI ESSENTIALS:
- - Yogamat (TB)
 
-  
-   </textarea>
-      </div><div class="area-card">
-        <div class="area-hdr"><div class="area-dot" style="background:#D4537E"></div><div><div class="area-title">Routine</div><div class="area-hint">Daily habits &amp; schedule</div></div></div>
-        <textarea class="dark-ta" placeholder="Your routine goals for 2026..." id="ta_routine" onchange="autosave(&#39;routine&#39;)">REFER DAILY ROUTINE </textarea>
-      </div><div class="area-card">
-        <div class="area-hdr"><div class="area-dot" style="background:#5DCAA5"></div><div><div class="area-title">Diet</div><div class="area-hint">Nutrition &amp; health</div></div></div>
-        <textarea class="dark-ta" placeholder="Your diet goals for 2026..." id="ta_diet" onchange="autosave(&#39;diet&#39;)"></textarea>
-      </div></div><div class="save-bar"><button class="save-btn" onclick="saveAll()">Save all goals</button><span class="save-ok" id="save-msg" style="display: none;">Saved successfully</span></div></div>
-</div>
+    <script>
+        const PHASES=[{id:'p1',label:'Phase 1',years:[2026],range:'2026',age:'28',accent:'#7F77DD',dim:'#1e1a3a'},{id:'p2',label:'Phase 2',years:[2027],range:'2027',age:'29',accent:'#378ADD',dim:'#0e1c30'},{id:'p3',label:'Phase 3',years:[2028],range:'2028',age:'30',accent:'#1D9E75',dim:'#0b1e18'},{id:'p4',label:'Phase 4',years:[2029,2030,2031,2032,2033],range:'2029–2033',age:'31–35',accent:'#EF9F27',dim:'#1e1607'},{id:'p5',label:'Phase 5',years:Array.from({length:10},(_,i)=>2034+i),range:'2034–2043',age:'36–45',accent:'#D85A30',dim:'#1e0e07'},{id:'p6',label:'Phase 6',years:Array.from({length:15},(_,i)=>2044+i),range:'2044–2058',age:'46–60',accent:'#D4537E',dim:'#1e0a14'},{id:'p7',label:'Phase 7',years:Array.from({length:24},(_,i)=>2059+i),range:'2059–2082',age:'61–84',accent:'#888780',dim:'#151514'}];
+        const AREAS=[{id:'agenda',label:'Agenda',hint:'Goals & milestones',dot:'#7F77DD'},{id:'place',label:'Place of stay',hint:'Location & housing',dot:'#378ADD'},{id:'income',label:'Income',hint:'Earnings & revenue',dot:'#1D9E75'},{id:'budget',label:'Budget',hint:'Spending & savings',dot:'#EF9F27'},{id:'things',label:'Things to own',hint:'Assets & possessions',dot:'#D85A30'},{id:'routine',label:'Routine',hint:'Daily habits & schedule',dot:'#D4537E'},{id:'diet',label:'Diet',hint:'Nutrition & health',dot:'#5DCAA5'}];
+        
+        let store={}, curPhase='p1', curYear=2026, curTab='annual';
 
-<script>
-const PHASES=[
-  {id:'p1',label:'Phase 1',years:[2026],range:'2026',age:'28',accent:'#7F77DD',dim:'#1e1a3a'},
-  {id:'p2',label:'Phase 2',years:[2027],range:'2027',age:'29',accent:'#378ADD',dim:'#0e1c30'},
-  {id:'p3',label:'Phase 3',years:[2028],range:'2028',age:'30',accent:'#1D9E75',dim:'#0b1e18'},
-  {id:'p4',label:'Phase 4',years:[2029,2030,2031,2032,2033],range:'2029–2033',age:'31–35',accent:'#EF9F27',dim:'#1e1607'},
-  {id:'p5',label:'Phase 5',years:Array.from({length:10},(_,i)=>2034+i),range:'2034–2043',age:'36–45',accent:'#D85A30',dim:'#1e0e07'},
-  {id:'p6',label:'Phase 6',years:Array.from({length:15},(_,i)=>2044+i),range:'2044–2058',age:'46–60',accent:'#D4537E',dim:'#1e0a14'},
-  {id:'p7',label:'Phase 7',years:Array.from({length:24},(_,i)=>2059+i),range:'2059–2082',age:'61–84',accent:'#888780',dim:'#151514'},
-];
-const AREAS=[
-  {id:'agenda',label:'Agenda',hint:'Goals & milestones',dot:'#7F77DD'},
-  {id:'place',label:'Place of stay',hint:'Location & housing',dot:'#378ADD'},
-  {id:'income',label:'Income',hint:'Earnings & revenue',dot:'#1D9E75'},
-  {id:'budget',label:'Budget',hint:'Spending & savings',dot:'#EF9F27'},
-  {id:'things',label:'Things to own',hint:'Assets & possessions',dot:'#D85A30'},
-  {id:'routine',label:'Routine',hint:'Daily habits & schedule',dot:'#D4537E'},
-  {id:'diet',label:'Diet',hint:'Nutrition & health',dot:'#5DCAA5'},
-];
-const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const DAILY_SLOTS=[
-  {k:'d1',t:'Morning  5–9 am'},{k:'d2',t:'Work block  9 am–1 pm'},
-  {k:'d3',t:'Afternoon  1–5 pm'},{k:'d4',t:'Evening  5–8 pm'},
-  {k:'d5',t:'Night  8–10 pm'},{k:'d6',t:'Weekends'},
-];
-let store={},curPhase='p1',curYear=2026,curTab='annual';
-function sk(ph,yr,area,suf){return`lp_${ph}_${yr}_${area}${suf?'_'+suf:''}`}
-function sv(k,v){try{localStorage.setItem(k,v)}catch(e){store[k]=v}}
-function lv(k){try{return localStorage.getItem(k)||store[k]||''}catch(e){return store[k]||''}}
-function filled(phId){let t=0,f=0;const ph=PHASES.find(p=>p.id===phId);ph.years.forEach(yr=>{AREAS.forEach(a=>{t++;if((lv(sk(phId,yr,a.id))||'').trim())f++})});return{t,f}}
-function renderStars(){const c=document.getElementById('stars-container');if(!c)return;c.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;pointer-events:none';for(let i=0;i<20;i++){const s=document.createElement('div');const sz=Math.random()*2+1;s.className='star';s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;opacity:${Math.random()*0.4+0.1}`;c.appendChild(s)}}
-function renderMetrics(){let tf=0,ta=0;PHASES.forEach(ph=>{const{t,f}=filled(ph.id);ta+=t;tf+=f});const pct=ta>0?Math.round(tf/ta*100):0;const yr=new Date().getFullYear();const age=28+(yr-2026);document.getElementById('metrics-row').innerHTML=`
-<div class="metric"><div class="metric-val" style="color:#9b97e8">7</div><div class="metric-label">phases</div><div class="metric-sub">life chapters</div></div>
-<div class="metric"><div class="metric-val" style="color:#378ADD">7</div><div class="metric-label">areas</div><div class="metric-sub">life dimensions</div></div>
-<div class="metric"><div class="metric-val" style="color:#1D9E75">${tf}</div><div class="metric-label">goals set</div><div class="metric-sub">of ${ta} slots</div></div>
-<div class="metric"><div class="metric-val" style="color:#EF9F27">${pct}%</div><div class="metric-label">complete</div><div class="metric-sub">playbook filled</div></div>
-<div class="metric"><div class="metric-val" style="color:#D4537E">${age}</div><div class="metric-label">current age</div><div class="metric-sub">years young</div></div>`}
-function renderNav(){document.getElementById('phase-nav').innerHTML=PHASES.map(ph=>{const{t,f}=filled(ph.id);const pct=t>0?Math.round(f/t*100):0;return`<button class="ph-btn${ph.id===curPhase?' active':''}" style="${ph.id===curPhase?`border-color:${ph.accent};color:${ph.accent}`:''}" onclick="selPhase('${ph.id}')">${ph.label}: ${ph.range} <span style="font-size:10px;opacity:0.6">${pct}%</span></button>`}).join('')}
-function selPhase(id){curPhase=id;curYear=PHASES.find(p=>p.id===id).years[0];curTab='annual';renderNav();renderBlock()}
-function selYear(yr){curYear=yr;renderBlock()}
-function selTab(t){curTab=t;renderBlock()}
-function renderBlock(){
-  const ph=PHASES.find(p=>p.id===curPhase);
-  const{t,f}=filled(curPhase);
-  const pct=t>0?Math.round(f/t*100):0;
-  let html=`
-  <div class="phase-top">
-    <div><div class="ph-title" style="color:${ph.accent}">${ph.label}: ${ph.range}</div><div class="ph-range">Ages ${ph.age}</div></div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <span style="font-size:11px;color:#6b6880">${f}/${t} goals</span>
-      <span class="ph-badge" style="border-color:${ph.accent};color:${ph.accent};background:${ph.dim}">${pct}% done</span>
-    </div>
-  </div>
-  <div class="progress-wrap">
-    <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${ph.accent}"></div></div>
-    <div class="progress-info"><span>Phase progress</span><span>${pct}%</span></div>
-  </div>`;
-  if(ph.years.length>1){html+=`<div class="year-row">`+ph.years.map(yr=>`<button class="yr-btn${yr===curYear?' active':''}" style="${yr===curYear?`background:${ph.dim};border-color:${ph.accent};color:${ph.accent}`:''}" onclick="selYear(${yr})">${yr}</button>`).join('')+`</div>`}
-  html+=`<div class="tab-strip">
-    <button class="tab-btn${curTab==='annual'?' active':''}" onclick="selTab('annual')">Annual goals</button>
-    <button class="tab-btn${curTab==='monthly'?' active':''}" onclick="selTab('monthly')">Monthly</button>
-    <button class="tab-btn${curTab==='daily'?' active':''}" onclick="selTab('daily')">Daily routine</button>
-  </div>`;
-  if(curTab==='annual'){
-    html+=`<div class="areas-grid">`;
-    AREAS.forEach(a=>{
-      const v=lv(sk(curPhase,curYear,a.id));
-      html+=`<div class="area-card">
-        <div class="area-hdr"><div class="area-dot" style="background:${a.dot}"></div><div><div class="area-title">${a.label}</div><div class="area-hint">${a.hint}</div></div></div>
-        <textarea class="dark-ta" placeholder="Your ${a.label.toLowerCase()} goals for ${curYear}..." id="ta_${a.id}" onchange="autosave('${a.id}')">${v}</textarea>
-      </div>`;
-    });
-  html += `<div class="save-bar">
-    <button class="save-btn" onclick="prepareDriveSave()">Save to Cloud</button>
-    <button class="save-btn" style="background:#4a5568; margin-left:10px" onclick="loadFromDrive()">Load from Cloud</button>
-    <span class="save-ok" id="save-msg">Action Successful</span>
-</div>`;
-  }
-  if(curTab==='monthly'){
-    html+=`<div class="months-wrap">`;
-    AREAS.forEach(a=>{
-      html+=`<div class="month-group"><div class="month-area-label"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${a.dot}"></span>${a.label} — ${curYear}</div><div class="months-grid">`;
-      MONTHS.forEach((m,mi)=>{
-        const v=lv(sk(curPhase,curYear,a.id,`m${mi}`));
-        html+=`<div class="month-card"><div class="month-lbl">${m} ${curYear}</div><textarea class="month-inp" placeholder="Goals for ${m}..." id="mta_${a.id}_${mi}" onchange="saveMonth('${a.id}',${mi})">${v}</textarea></div>`;
-      });
-      html+=`</div></div>`;
-    });
-    html+=`</div>`;
-  }
-  if(curTab==='daily'){
-    html+=`<div class="daily-wrap">`;
-    DAILY_SLOTS.forEach(s=>{
-      const v=lv(sk(curPhase,curYear,'daily',s.k));
-      html+=`<div class="daily-card"><div class="daily-time">${s.t}</div><textarea class="dark-ta" placeholder="What will you do during this block?" id="daily_${s.k}" style="min-height:64px" onchange="saveDaily('${s.k}')">${v}</textarea></div>`;
-    });
-    html += `<div class="save-bar"><button class="save-btn" onclick="prepareDriveSaveDaily()">Save to Cloud</button><span class="save-ok" id="save-msg">Saved successfully</span></div>`;
-  }
-  document.getElementById('phase-block').innerHTML=html;
-}
-function autosave(id){const el=document.getElementById(`ta_${id}`);if(el)sv(sk(curPhase,curYear,id),el.value);renderNav();renderMetrics()}
-function saveAll(){AREAS.forEach(a=>{const el=document.getElementById(`ta_${a.id}`);if(el)sv(sk(curPhase,curYear,a.id),el.value)});const m=document.getElementById('save-msg');if(m){m.style.display='inline';setTimeout(()=>m.style.display='none',2000)}renderNav();renderMetrics()}
-function saveMonth(aId,mi){const el=document.getElementById(`mta_${aId}_${mi}`);if(el)sv(sk(curPhase,curYear,aId,`m${mi}`),el.value)}
-function saveDaily(s){const el=document.getElementById(`daily_${s}`);if(el)sv(sk(curPhase,curYear,'daily',s),el.value)}
-function saveAllDaily(){DAILY_SLOTS.forEach(s=>{const el=document.getElementById(`daily_${s.k}`);if(el)sv(sk(curPhase,curYear,'daily',s.k),el.value)});const m=document.getElementById('save-msg');if(m){m.style.display='inline';setTimeout(()=>m.style.display='none',2000)}}
-renderStars();renderMetrics();renderNav();renderBlock();
-function prepareDriveSave() {
-    saveAll(); 
-    const allData = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('lp_')) {
-            allData[key] = localStorage.getItem(key);
+        function sk(ph,yr,area){return `lp_${ph}_${yr}_${area}`}
+        function sv(k,v){localStorage.setItem(k,v)}
+        function lv(k){return localStorage.getItem(k)||''}
+
+        function renderNav(){
+            document.getElementById('phase-nav').innerHTML=PHASES.map(ph=>`<button class="ph-btn ${ph.id===curPhase?'active':''}" onclick="selPhase('${ph.id}')">${ph.label}</button>`).join('');
         }
-    }
-    saveToDrive(allData);
-}
 
-function prepareDriveSaveDaily() {
-    saveAllDaily();
-    const allData = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('lp_')) {
-            allData[key] = localStorage.getItem(key);
-        }
-    }
-    saveToDrive(allData);
-}
-// --- GOOGLE DRIVE CONFIG ---
-let tokenClient;
-let gapiInited = false;
-let gisInited = false;
+        function selPhase(id){ curPhase=id; renderBlock(); renderNav(); }
+        function selTab(t){ curTab=t; renderBlock(); }
 
-function gapiLoaded() {
-    gapi.load('client', initializeGapiClient);
-}
-
-async function initializeGapiClient() {
-    await gapi.client.init({
-        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
-    });
-    gapiInited = true;
-}
-
-function gisLoaded() {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: '87624151021-vbmk6ehvie52k9ome6vsvmkeceeq42b0.apps.googleusercontent.com',
-        scope: 'https://www.googleapis.com/auth/drive.file',
-        callback: '', 
-    });
-    gisInited = true;
-}
-
-async function saveToDrive(data) {
-    const metadata = { name: 'playbook_data.json', mimeType: 'application/json' };
-    const file = new Blob([JSON.stringify(data)], { type: 'application/json' });
-
-    tokenClient.callback = async (resp) => {
-        if (resp.error !== undefined) throw (resp);
-        const response = await gapi.client.drive.files.list({
-            q: "name = 'playbook_data.json' and trashed = false",
-            fields: 'files(id)',
-        });
-        const existingFile = response.result.files[0];
-        if (existingFile) {
-            await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}?uploadType=media`, {
-                method: 'PATCH',
-                headers: { 'Authorization': `Bearer ${gapi.auth.getToken().access_token}` },
-                body: file
-            });
-        } else {
-            const form = new FormData();
-            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-            form.append('file', file);
-            await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${gapi.auth.getToken().access_token}` },
-                body: form
-            });
-        }
-        alert("Saved to Google Drive!");
-    };
-
-    if (gapi.auth.getToken() === null) {
-        tokenClient.requestAccessToken({ prompt: 'consent' });
-    } else {
-        tokenClient.requestAccessToken({ prompt: '' });
-    }
-}
-
-// Function to manually pull data back from Google Drive
-async function loadFromDrive() {
-    if (!tokenClient) {
-        alert("Google Drive not initialized. Please refresh.");
-        return;
-    }
-    
-    tokenClient.callback = async (resp) => {
-        if (resp.error !== undefined) throw (resp);
-        const response = await gapi.client.drive.files.list({
-            q: "name = 'playbook_data.json' and trashed = false",
-            fields: 'files(id)',
-        });
-        const file = response.result.files[0];
-        if (file) {
-            const res = await gapi.client.drive.files.get({ fileId: file.id, alt: 'media' });
-            const data = res.result;
-            // Restore all keys to local storage
-            for (const key in data) {
-                localStorage.setItem(key, data[key]);
+        function renderBlock(){
+            const ph=PHASES.find(p=>p.id===curPhase);
+            let html=`<div class="phase-top"><div>${ph.label}: ${ph.range}</div></div>`;
+            html+=`<div class="tab-strip"><button class="tab-btn ${curTab==='annual'?'active':''}" onclick="selTab('annual')">Annual goals</button></div>`;
+            
+            if(curTab==='annual'){
+                html+=`<div class="areas-grid">`;
+                AREAS.forEach(a=>{
+                    const v=lv(sk(curPhase,curYear,a.id));
+                    html+=`<div class="area-card"><div class="area-title">${a.label}</div><textarea class="dark-ta" id="ta_${a.id}">${v}</textarea></div>`;
+                });
+                html+=`</div><div class="save-bar">
+                    <button class="save-btn" onclick="prepareDriveSave()">Save to Cloud</button>
+                    <button class="save-btn" style="background:#4a5568" onclick="loadFromDrive()">Load from Cloud</button>
+                </div>`;
             }
-            alert("Data loaded from Cloud! Your Life Playbook is updating...");
-            location.reload(); 
-        } else {
-            alert("No backup found on Google Drive.");
+            document.getElementById('phase-block').innerHTML=html;
         }
-    };
-    
-    // Request access to read the file
-    tokenClient.requestAccessToken({ prompt: '' });
-}
-</script>
+
+        function saveAll(){
+            AREAS.forEach(a=>{
+                const el=document.getElementById(`ta_${a.id}`);
+                if(el) sv(sk(curPhase,curYear,a.id), el.value);
+            });
+        }
+
+        function prepareDriveSave() {
+            saveAll();
+            const allData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('lp_')) allData[key] = localStorage.getItem(key);
+            }
+            saveToDrive(allData);
+        }
+
+        async function saveToDrive(data) {
+            if(!gisInited) { alert("Google not ready"); return; }
+            tokenClient.callback = async (resp) => {
+                const metadata = { name: 'playbook_data.json', mimeType: 'application/json' };
+                const file = new Blob([JSON.stringify(data)], { type: 'application/json' });
+                const response = await gapi.client.drive.files.list({ q: "name = 'playbook_data.json' and trashed = false" });
+                const existingFile = response.result.files[0];
+                
+                const url = existingFile 
+                    ? `https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}?uploadType=media`
+                    : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+                
+                const method = existingFile ? 'PATCH' : 'POST';
+                const body = existingFile ? file : new FormData();
+                if(!existingFile){
+                    body.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                    body.append('file', file);
+                }
+
+                await fetch(url, {
+                    method: method,
+                    headers: { 'Authorization': `Bearer ${gapi.auth.getToken().access_token}` },
+                    body: body
+                });
+                alert("Saved to Google Drive!");
+            };
+            tokenClient.requestAccessToken({ prompt: 'consent' });
+        }
+
+        async function loadFromDrive() {
+            tokenClient.callback = async (resp) => {
+                const response = await gapi.client.drive.files.list({ q: "name = 'playbook_data.json' and trashed = false", fields: 'files(id)' });
+                if (response.result.files[0]) {
+                    const res = await gapi.client.drive.files.get({ fileId: response.result.files[0].id, alt: 'media' });
+                    for (const key in res.result) localStorage.setItem(key, res.result[key]);
+                    location.reload();
+                } else { alert("No backup found."); }
+            };
+            tokenClient.requestAccessToken({ prompt: '' });
+        }
+
+        renderNav(); renderBlock();
+    </script>
 </body>
 </html>

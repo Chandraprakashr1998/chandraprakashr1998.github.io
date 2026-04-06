@@ -90,7 +90,7 @@
         
         let curPhase='p1', curTab='annual';
 
-        function sk(ph, area) { return `lp_${ph}_${area}`; }
+        function sk(ph, area) { return `lp_${ph}_2026_${area}`; }
         function sv(k,v){localStorage.setItem(k,v)}
         function lv(k){return localStorage.getItem(k)||''}
 
@@ -168,9 +168,8 @@
             tokenClient.requestAccessToken({ prompt: 'consent' });
         }
 
-async function loadFromDrive() {
+ async function loadFromDrive() {
     if (!tokenClient) { alert("Google Drive not initialized."); return; }
-    
     tokenClient.callback = async (resp) => {
         if (resp.error !== undefined) throw (resp);
         const response = await gapi.client.drive.files.list({
@@ -181,7 +180,7 @@ async function loadFromDrive() {
         if (file) {
             const res = await gapi.client.drive.files.get({ fileId: file.id, alt: 'media' });
             const data = res.result;
-            // This ensures all data from the cloud is moved into your browser memory
+            // This loop moves every piece of cloud data into your browser's memory
             Object.keys(data).forEach(key => {
                 localStorage.setItem(key, data[key]);
             });
@@ -192,7 +191,7 @@ async function loadFromDrive() {
         }
     };
     tokenClient.requestAccessToken({ prompt: '' });
-}        
+}
 
         renderNav(); renderBlock();
     </script>

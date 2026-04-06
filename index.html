@@ -10,7 +10,7 @@
 
     <script>
       // Your specific Google Client ID from the console
-      const CLIENT_ID = '87624151021-vbmk6scv33m6m6m6m6m6m6m6m6.apps.googleusercontent.com'; 
+    const CLIENT_ID = '87624151021-vbmk6ehvie52k9ome6vsvmkeceeq42b0.apps.googleusercontent.com';
       const SCOPES = 'https://www.googleapis.com/auth/drive.file';
     </script>
 <style>
@@ -296,7 +296,7 @@ function prepareDriveSave() {
     const allData = {};
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('lp_')) {
+        if (key && key.startsWith('lp_')) {
             allData[key] = localStorage.getItem(key);
         }
     }
@@ -308,7 +308,7 @@ function prepareDriveSaveDaily() {
     const allData = {};
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('lp_')) {
+        if (key && key.startsWith('lp_')) {
             allData[key] = localStorage.getItem(key);
         }
     }
@@ -378,6 +378,11 @@ async function saveToDrive(data) {
 
 // Function to manually pull data back from Google Drive
 async function loadFromDrive() {
+    if (!tokenClient) {
+        alert("Google Drive not initialized. Please refresh.");
+        return;
+    }
+    
     tokenClient.callback = async (resp) => {
         if (resp.error !== undefined) throw (resp);
         const response = await gapi.client.drive.files.list({
@@ -388,15 +393,18 @@ async function loadFromDrive() {
         if (file) {
             const res = await gapi.client.drive.files.get({ fileId: file.id, alt: 'media' });
             const data = res.result;
+            // Restore all keys to local storage
             for (const key in data) {
                 localStorage.setItem(key, data[key]);
             }
-            alert("Data loaded from Cloud! Refreshing...");
+            alert("Data loaded from Cloud! Your Life Playbook is updating...");
             location.reload(); 
         } else {
             alert("No backup found on Google Drive.");
         }
     };
+    
+    // Request access to read the file
     tokenClient.requestAccessToken({ prompt: '' });
 }
 </script>

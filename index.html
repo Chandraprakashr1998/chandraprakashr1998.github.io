@@ -90,7 +90,7 @@
         
         let curPhase='p1', curTab='annual';
 
-        function sk(ph, area) { return `lp_${ph}_2026_${area}`; }
+        function sk(ph, area) { return `lp_${ph}_${area}`; }
         function sv(k,v){localStorage.setItem(k,v)}
         function lv(k){return localStorage.getItem(k)||''}
 
@@ -168,19 +168,31 @@
             tokenClient.requestAccessToken({ prompt: 'consent' });
         }
 
-        async function loadFromDrive() {
-            tokenClient.callback = async (resp) => {
-                const response = await gapi.client.drive.files.list({ q: "name = 'playbook_data.json' and trashed = false", fields: 'files(id)' });
-                if (response.result.files[0]) {
-                    const res = await gapi.client.drive.files.get({ fileId: response.result.files[0].id, alt: 'media' });
-                    const data = res.result;
-                    for (const key in data) localStorage.setItem(key, data[key]);
-                    alert("Data Loaded! Refreshing...");
-                    location.reload();
-                } else { alert("No backup found on Drive."); }
-            };
-            tokenClient.requestAccessToken({ prompt: '' });
+async function loadFromDrive() {
+    if (!tokenClient) { alert("Google Drive not initialized."); return; }
+    
+    tokenClient.callback = async (resp) => {
+        if (resp.error !== undefined) throw (resp);
+        const response = await gapi.client.drive.files.list({
+            q: "name = 'playbook_data.json' and trashed = false",
+            fields: 'files(id)',
+        });
+        const file = response.result.files[0];
+        if (file) {
+            const res = await gapi.client.drive.files.get({ fileId: file.id, alt: 'media' });
+            const data = res.result;
+            // This ensures all data from the cloud is moved into your browser memory
+            Object.keys(data).forEach(key => {
+                localStorage.setItem(key, data[key]);
+            });
+            alert("Sync Complete! Your data has been restored.");
+            location.reload(); 
+        } else {
+            alert("No backup found on Google Drive.");
         }
+    };
+    tokenClient.requestAccessToken({ prompt: '' });
+}        
 
         renderNav(); renderBlock();
     </script>

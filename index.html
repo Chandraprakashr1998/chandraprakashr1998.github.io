@@ -257,7 +257,7 @@ function renderBlock(){
         <textarea class="dark-ta" placeholder="Your ${a.label.toLowerCase()} goals for ${curYear}..." id="ta_${a.id}" onchange="autosave('${a.id}')">${v}</textarea>
       </div>`;
     });
-    html+=`</div><div class="save-bar"><button class="save-btn" onclick="saveAll()">Save all goals</button><span class="save-ok" id="save-msg">Saved successfully</span></div>`;
+    html += `<div class="save-bar"><button class="save-btn" onclick="prepareDriveSave()">Save to Cloud</button><span class="save-ok" id="save-msg">Saved successfully</span></div>`;
   }
   if(curTab==='monthly'){
     html+=`<div class="months-wrap">`;
@@ -277,7 +277,7 @@ function renderBlock(){
       const v=lv(sk(curPhase,curYear,'daily',s.k));
       html+=`<div class="daily-card"><div class="daily-time">${s.t}</div><textarea class="dark-ta" placeholder="What will you do during this block?" id="daily_${s.k}" style="min-height:64px" onchange="saveDaily('${s.k}')">${v}</textarea></div>`;
     });
-    html+=`</div><div class="save-bar"><button class="save-btn" onclick="saveAllDaily()">Save routine</button><span class="save-ok" id="save-msg">Saved successfully</span></div>`;
+    html += `<div class="save-bar"><button class="save-btn" onclick="prepareDriveSaveDaily()">Save to Cloud</button><span class="save-ok" id="save-msg">Saved successfully</span></div>`;
   }
   document.getElementById('phase-block').innerHTML=html;
 }
@@ -287,7 +287,79 @@ function saveMonth(aId,mi){const el=document.getElementById(`mta_${aId}_${mi}`);
 function saveDaily(s){const el=document.getElementById(`daily_${s}`);if(el)sv(sk(curPhase,curYear,'daily',s),el.value)}
 function saveAllDaily(){DAILY_SLOTS.forEach(s=>{const el=document.getElementById(`daily_${s.k}`);if(el)sv(sk(curPhase,curYear,'daily',s.k),el.value)});const m=document.getElementById('save-msg');if(m){m.style.display='inline';setTimeout(()=>m.style.display='none',2000)}}
 renderStars();renderMetrics();renderNav();renderBlock();
+    function prepareDriveSave() {
+    saveAll(); // Runs your original save logic
+    const allData = JSON.parse(localStorage.getItem('playbook_data') || '{}');
+    saveToDrive(allData);
+}
+
+function prepareDriveSaveDaily() {
+    saveAllDaily(); // Runs your original daily save logic
+    const allData = JSON.parse(localStorage.getItem('playbook_data') || '{}');
+    saveToDrive(allData);
+}
+// --- GOOGLE DRIVE CONFIG ---
+let tokenClient;
+let gapiInited = false;
+let gisInited = false;
+
+function gapiLoaded() {
+    gapi.load('client', initializeGapiClient);
+}
+
+async function initializeGapiClient() {
+    await gapi.client.init({
+        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
+    });
+    gapiInited = true;
+    // Initial load happens after GIS is also ready
+}
+
+function gisLoaded() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: '', 
+    });
+    gisInited = true;
+}
+
+async function saveToDrive(data) {
+    const metadata = { name: 'playbook_data.json', mimeType: 'application/json' };
+    const file = new Blob([JSON.stringify(data)], { type: 'application/json' });
+
+    tokenClient.callback = async (resp) => {
+        if (resp.error !== undefined) throw (resp);
+        const response = await gapi.client.drive.files.list({
+            q: "name = 'playbook_data.json' and trashed = false",
+            fields: 'files(id)',
+        });
+        const existingFile = response.result.files[0];
+        if (existingFile) {
+            await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}?uploadType=media`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `Bearer ${gapi.auth.getToken().access_token}` },
+                body: file
+            });
+        } else {
+            const form = new FormData();
+            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+            form.append('file', file);
+            await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${gapi.auth.getToken().access_token}` },
+                body: form
+            });
+        }
+        alert("Saved to Google Drive!");
+    };
+
+    if (gapi.auth.getToken() === null) {
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+    } else {
+        tokenClient.requestAccessToken({ prompt: '' });
+    }
+}
 </script>
-
-
-</body></html>
+</body>
+</html>
